@@ -2,3 +2,7 @@ pandas
 bs4
 requests
 lxml
+pdfplumber
+pytesseract
+pdf2image
+Pillow
