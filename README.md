@@ -47,6 +47,7 @@ A cleaning function removes: non‑standard characters, symbol clusters, repeate
 Some fields contain HTML fragments or irregular spacing.
 The preprocessing removes: HTML tags, line breaks, tabs, and excessive whitespace.
 
+
 ---
 
 ## 3. Web Scraping (DrillingEdge.com)
@@ -70,7 +71,7 @@ After combining PDF-extracted and web-scraped data, the module performs:
 - **Missing Value Handling:** Text → "N/A", Numeric → 0
 - **Coordinate Normalization:** Latitude and longitude converted to numeric where possible
 
-**Output:** `final_well_data_cleaned.csv` — used for MySQL insertion and map visualization in Part 2.
+**Output:** `final_well_data_cleaned.csv` --> used for MySQL insertion and map visualization in Part 2.
 
 ---
 
