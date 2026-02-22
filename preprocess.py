@@ -66,6 +66,54 @@ def remove_ocr_unwanted(text):
 
     return text.strip()
 
+def convert_dms(value):
+    """Convert DMS like 48°02'00.22\"N or OCR-damaged 48.02 00.22 N to decimal degrees."""
+    if pd.isna(value):
+        return None
+
+    value = str(value).strip()
+
+    # If already decimal
+    try:
+        return float(value)
+    except:
+        pass
+
+    # Normalize separators
+    value = value.replace("°", " ").replace("'", " ").replace('"', " ")
+    value = re.sub(r"\s+", " ", value)
+
+    # Extract numbers
+    parts = re.findall(r"[-]?\d+\.?\d*", value)
+
+    # Case 1: standard DMS (3 numbers)
+    if len(parts) >= 3:
+        deg, minutes, seconds = map(float, parts[:3])
+        decimal = deg + minutes/60 + seconds/3600
+
+    # Case 2: OCR-damaged DMS (2 numbers)
+    elif len(parts) == 2:
+        deg = float(parts[0])
+
+        # minutes.seconds → split
+        if "." in parts[1]:
+            minutes = float(parts[1].split('.')[0])
+            seconds = float("0." + parts[1].split('.')[1]) * 60
+        else:
+            minutes = float(parts[1])
+            seconds = 0.0
+
+        decimal = deg + minutes/60 + seconds/3600
+
+    else:
+        return None
+
+    # West/South --> negative
+    if "S" in value.upper() or "W" in value.upper():
+        decimal = -decimal
+
+    return decimal
+
 # 2) MAIN PREPROCESSING PIPELINE
 
 def preprocess():
@@ -84,10 +132,6 @@ def preprocess():
         "closest_city"
     ]
 
-    for col in text_columns:
-        if col in df.columns:
-            df[col] = df[col].apply(remove_html).apply(clean_text).apply(remove_ocr_unwanted)
-
     # Convert dates
     if "spud_date" in df.columns:
         df["spud_date"] = df["spud_date"].apply(to_date)
@@ -102,19 +146,23 @@ def preprocess():
     if "gas_produced" in df.columns:
         df["gas_produced"] = df["gas_produced"].apply(to_numeric)
 
-    # Ensure latitude/longitude are numeric
+    # Convert latitude/longitude (decimal or DMS)
     if "latitude" in df.columns:
-        df["latitude"] = pd.to_numeric(df["latitude"], errors="coerce")
+        df["latitude"] = df["latitude"].apply(convert_dms)
 
     if "longitude" in df.columns:
-        df["longitude"] = pd.to_numeric(df["longitude"], errors="coerce")
+        df["longitude"] = df["longitude"].apply(convert_dms)
+
+    for col in text_columns:
+        if col in df.columns:
+            df[col] = df[col].apply(remove_html).apply(clean_text).apply(remove_ocr_unwanted)
 
     # Replace missing values
     df = df.fillna("N/A")
 
     # Save cleaned output
     df.to_csv("final_well_data_cleaned.csv", index=False)
-    print("Saved → final_well_data_cleaned.csv")
+    print("Saved --> final_well_data_cleaned.csv")
 
 
 if __name__ == "__main__":
