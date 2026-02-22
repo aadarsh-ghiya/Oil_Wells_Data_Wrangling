@@ -62,6 +62,7 @@ For each cleaned well entry, the module:
 A delay is added between requests to avoid rate‑limiting.
 
 **Output:** `final_well_data.csv`
+
 ---
 
 ## 4. Final Preprocessing
