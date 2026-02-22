@@ -61,6 +61,7 @@ For each cleaned well entry, the module:
 
 A delay is added between requests to avoid rate‑limiting.
 
+**Output:** `final_well_data.csv`
 ---
 
 ## 4. Final Preprocessing
@@ -70,7 +71,7 @@ After combining PDF-extracted and web-scraped data, the module performs:
 - **Numeric Conversion:** Production values (e.g., "1.7 k") → numeric (e.g., 1700)
 - **Missing Value Handling:** Text → "N/A", Numeric → 0
 - **Coordinate Normalization:** Latitude and longitude converted to numeric where possible
-
+  
 **Output:** `final_well_data_cleaned.csv` --> used for MySQL insertion and map visualization in Part 2.
 
 ---
