@@ -160,7 +160,7 @@ SET latitude = NULLIF(@latitude, 'N/A'),
 
 ```
 python scraper.py
-python preprocess.py
+python preprocess.py 
 ```
 
 ## 12. Dependencies
